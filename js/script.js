@@ -2,6 +2,15 @@ const global = {
   currentPage: window.location.pathname,
 };
 
+const options = {
+  method: "GET",
+  headers: {
+    accept: "application/json",
+    Authorization:
+      "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMWUyN2Y1MjQ2NWM4MWY1YjNlMWQ4OGM1NjE1MTUzMyIsInN1YiI6IjY0YmI1NDc0ZWI3OWMyMDBlMjhjYjYwYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.PiSeqGdciSnRUE7KdUT-kkcLVLYk2nBc_SZdbxP9TTo",
+  },
+};
+
 // Hilight active links
 function highlightActive() {
   const navLinks = document.querySelectorAll(".nav-link");
@@ -31,15 +40,6 @@ function highlightActive() {
 
 // display popular movies on home page
 function displayPopularMovies() {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMWUyN2Y1MjQ2NWM4MWY1YjNlMWQ4OGM1NjE1MTUzMyIsInN1YiI6IjY0YmI1NDc0ZWI3OWMyMDBlMjhjYjYwYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.PiSeqGdciSnRUE7KdUT-kkcLVLYk2nBc_SZdbxP9TTo",
-    },
-  };
-
   fetch(
     "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1",
     options
@@ -75,6 +75,43 @@ function displayPopularMovies() {
     .catch((err) => console.error(err));
 }
 
+// display popular TV shows
+function displayPopularTVShows() {
+  fetch(
+    "https://api.themoviedb.org/3/tv/popular?language=en-US&page=1",
+    options
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      const shows = data.results;
+      shows.forEach((show) => {
+        const popularShows = document.getElementById("popular-shows");
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `<a href="movie-details.html?id=${show.id}">
+
+        ${
+          show.poster_path
+            ? `<img src="https://image.tmdb.org/t/p/w500${show.poster_path}" alt="${show.name}" />`
+            : `<img src="..images/no-image.jpg" alt="${show.name}" />`
+        }
+
+      </a>
+      <div class="card-body">
+        <h5 class="card-title">${show.name}</h5>
+        <p class="card-text">
+          <small class="text-muted">Release:
+          ${show.first_air_date}</small>
+        </p>
+      </div>`;
+        popularShows.appendChild(div);
+      });
+    })
+
+    .catch((err) => console.error(err));
+}
+
 function init() {
   switch (global.currentPage) {
     case "/":
@@ -84,6 +121,7 @@ function init() {
       break;
     case "/shows.html":
       console.log("shows");
+      displayPopularTVShows();
       break;
     case "/movie-details.html":
       console.log("movie details");
