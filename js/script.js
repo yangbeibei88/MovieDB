@@ -11,6 +11,8 @@ const options = {
   },
 };
 
+const spinner = document.querySelector(".spinner");
+
 // Hilight active links
 function highlightActive() {
   const navLinks = document.querySelectorAll(".nav-link");
@@ -112,6 +114,19 @@ function displayPopularTVShows() {
     .catch((err) => console.error(err));
 }
 
+function showSpinner() {
+  spinner.classList.add("show");
+  console.log("loading");
+}
+
+function hideSpinner() {
+  // spinner.className = "spinner";
+  if (document.readyState == "complete") {
+    spinner.classList.remove("show");
+    console.log("content loaded");
+  }
+}
+
 function init() {
   switch (global.currentPage) {
     case "/":
@@ -134,3 +149,5 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+document.addEventListener("DOMContentLoaded", showSpinner);
+document.addEventListener("readystatechange", hideSpinner);
