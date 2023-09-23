@@ -114,6 +114,100 @@ function displayPopularTVShows() {
     .catch((err) => console.error(err));
 }
 
+// display movie details
+function displayMovieDetails() {
+  // const currentMovieID = location.search.slice(4);
+  const currentMovieID = location.search.split("=")[1];
+  fetch(
+    `https://api.themoviedb.org/3/movie/${currentMovieID}?language=en-US`,
+    options
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      console.log(data.genres);
+      const movieDetails = document.getElementById("movie-details");
+      const topDetailsDiv = document.createElement("div");
+
+      // genreArr = Array.from(data.genres, (genre) => {
+      //   return `<li>${genre.name}<li>`;
+      // });
+      genreArr = data.genres
+        .map((genre) => {
+          return `<li>${genre.name}<li>`;
+        })
+        .join("");
+      // prodCompanyArr = Array.from(data.production_companies, (company) => {
+      //   return company.name;
+      // });
+      prodCompanyArr = data.production_companies
+        .map((company) => {
+          return `<span>${company.name}</span>`;
+        })
+        .join(", ");
+
+      topDetailsDiv.innerHTML = `<div class="details-top"><div>
+      ${
+        data.poster_path
+          ? `<img src="https://image.tmdb.org/t/p/w500${data.poster_path}"
+        class="card-img-top"
+        alt="${data.title}" />`
+          : `<img src="images/no-image.jpg"
+        class="card-img-top"
+        alt="${data.title}" />`
+      }
+      
+    </div>
+    <div>
+      <h2>${data.title}</h2>
+      <h3 class="tagline">${data.tagline}<h3>
+      <p>
+        <i
+          class="fas fa-star text-primary"></i>
+        ${data.vote_average.toFixed(2)} / 10
+      </p>
+      <p class="text-muted">Release Date:
+      ${data.release_date}</p>
+      <p>
+      ${data.overview}
+      </p>
+      <h5>Genres</h5>
+      <ul class="list-group" id="genre">
+      ${genreArr}
+      </ul>
+      <a href="${data.homepage}" target="_blank"
+        class="btn">Visit Movie Homepage</a>
+    </div></div>`;
+      movieDetails.appendChild(topDetailsDiv);
+      const bottomDetailsDiv = document.createElement("div");
+      bottomDetailsDiv.innerHTML = `<div class="details-bottom">
+      <h2>Movie Info</h2>
+      <ul>
+        <li><span
+            class="text-secondary">Budget:</span>
+          ${formatMoney(data.budget)}</li>
+        <li><span
+            class="text-secondary">Revenue:</span>
+          ${formatMoney(data.revenue)}</li>
+        <li><span
+            class="text-secondary">Runtime:</span>
+          ${data.runtime} minutes</li>
+        <li><span
+            class="text-secondary">Status:</span>
+          ${data.status}</li>
+      </ul>
+      <h4>Production Companies</h4>
+      <div class="list-group">${prodCompanyArr}</div>
+    </div>`;
+      movieDetails.appendChild(bottomDetailsDiv);
+    })
+    .catch((err) => console.error(err));
+}
+
+function formatMoney(number) {
+  return "$" + number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+}
+
 function showSpinner() {
   spinner.classList.add("show");
   console.log("loading");
@@ -140,6 +234,7 @@ function init() {
       break;
     case "/movie-details.html":
       console.log("movie details");
+      displayMovieDetails();
     case "/tv-details.html":
       console.log("tv details");
     case "/search.html":
