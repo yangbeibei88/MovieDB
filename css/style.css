@@ -216,6 +216,25 @@ section h2 {
 }
 
 /* Movie Details */
+.backdrop {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://www.themoviedb.org/t/p/original/4XM8DUTQb3lhLemJC51Jx4a2EuA.jpg"); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+/* #movie-details {
+  position: relative;
+} */
+
 .tagline {
   font-style: italic;
   text-align: center;
