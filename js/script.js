@@ -1,5 +1,12 @@
 const global = {
   currentPage: window.location.pathname,
+  search: {
+    term: "",
+    type: "",
+    page: 1,
+    totalPages: 1,
+    totalResults: 0,
+  },
 };
 
 const options = {
@@ -60,7 +67,7 @@ function displayPopularMovies() {
         ${
           movie.poster_path
             ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />`
-            : `<img src="..images/no-image.jpg" alt="${movie.title}" />`
+            : `<img src="images/no-image.jpg" alt="${movie.title}" />`
         }
 
       </a>
@@ -96,7 +103,7 @@ function displayPopularTVShows() {
         ${
           show.poster_path
             ? `<img src="https://image.tmdb.org/t/p/w500${show.poster_path}" alt="${show.name}" />`
-            : `<img src="..images/no-image.jpg" alt="${show.name}" />`
+            : `<img src="images/no-image.jpg" alt="${show.name}" />`
         }
 
       </a>
@@ -242,10 +249,10 @@ function displayTVDetails() {
         data.poster_path
           ? `<img src="https://image.tmdb.org/t/p/w500${data.poster_path}"
         class="card-img-top"
-        alt="${data.title}" />`
+        alt="${data.name}" />`
           : `<img src="images/no-image.jpg"
         class="card-img-top"
-        alt="${data.title}" />`
+        alt="${data.name}" />`
       }
       
     </div>
@@ -283,9 +290,14 @@ function displayTVDetails() {
           ${data.first_air_date}</li>
         <li><span
             class="text-secondary">Last Episode To Air:</span>
-          ${data.last_episode_to_air.air_date} ${
-        data.last_episode_to_air.name
-      }</li>
+            ${
+              data.last_episode_to_air === null
+                ? `null`
+                : data.last_episode_to_air.air_date +
+                  " " +
+                  data.last_episode_to_air.name
+            }
+         </li>
         <li><span
             class="text-secondary">Episode Runtime:</span>
           ${data.episode_run_time} minutes</li>
@@ -304,6 +316,190 @@ function displayTVDetails() {
 function displayBackdrop(backdropPath) {
   const backdrop = document.querySelector(".backdrop");
   backdrop.style.backgroundImage = `url("https://image.tmdb.org/t/p/original${backdropPath}")`;
+}
+
+function displayNowplaying() {
+  fetch(
+    "https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1",
+    options
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data.results);
+      data.results.forEach((movie) => {
+        // console.log(movie);
+        const div = document.createElement("div");
+        div.className = "swiper-slide";
+        div.innerHTML = `
+        <a href="movie-details.html?id=${movie.id}">
+        ${
+          movie.poster_path
+            ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />`
+            : `<img src="/images/no-image.jpg" alt="${movie.title}" />`
+        }
+          
+        </a>
+        <h4 class="swiper-rating">
+          <i class="fas fa-star text-secondary"></i> ${movie.vote_average.toFixed(
+            2
+          )} / 10
+        </h4>`;
+        document.querySelector(".swiper-wrapper").appendChild(div);
+
+        initSwiper();
+      });
+    })
+    .catch((err) => console.error(err));
+}
+
+function initSwiper() {
+  const swiper = new Swiper(".swiper", {
+    slidesPerView: 1,
+    speed: 400,
+    spaceBetween: 30,
+    freeMode: true,
+    loop: true,
+    autoplay: {
+      delay: 5000,
+      disableOnInteraction: false,
+    },
+    breakpoints: {
+      // when window width is >= 320px
+      320: {
+        slidesPerView: 1,
+      },
+      // when window width is >= 480px
+      480: {
+        slidesPerView: 2,
+      },
+      // when window width is >= 640px
+      640: {
+        slidesPerView: 3,
+      },
+      1200: {
+        slidesPerView: 4,
+      },
+    },
+  });
+}
+
+// search movies/show
+// function search() {
+//   const queryString = window.location.search;
+//   const urlParams = new URLSearchParams(queryString);
+
+//   global.search.type = urlParams.get("type");
+//   global.search.term = urlParams.get("search-term");
+
+//   if (global.search.term !== "" && global.search.term !== null) {
+//     const results = searchAPIData();
+//     // showAlert(
+//     //   `There are ${results.total_results} search results of ${global.search.term}`,
+//     //   "alert-success"
+//     // );
+//     console.log(results);
+//     // console.log(results.total_results);
+//   } else {
+//     showAlert("Please enter a search term", "alert-error");
+//   }
+// }
+
+function search() {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+
+  global.search.type = urlParams.get("type");
+  global.search.term = urlParams.get("search-term");
+
+  fetch(
+    `https://api.themoviedb.org/3/search/${global.search.type}?query=${global.search.term}&language=en-US`,
+    options
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (global.search.term !== "" && global.search.term !== null) {
+        showAlert(
+          `There are ${data.total_results} search results of ${global.search.term} in ${global.search.type}`,
+          "alert-success"
+        );
+        console.log(data);
+        console.log(data.results);
+        global.search.page = data.page;
+        global.search.totalPages = data.total_pages;
+        global.search.totalResults = data.total_results;
+
+        const searchResults = data.results;
+
+        if (searchResults === 0) {
+          showAlert("No results found");
+          return;
+        }
+
+        const searchRadio = document.querySelector(".search-radio");
+        if (global.search.type === "movie") {
+          searchRadio.querySelector("input#movie").checked = true;
+        } else if (global.search.type === "tv") {
+          searchRadio.querySelector("input#tv").checked = true;
+        }
+
+        document.querySelector("#search-term").value = global.search.term;
+
+        searchResults.forEach((result) => {
+          const div = document.createElement("div");
+          div.classList.add("card");
+          div.innerHTML = `<a href="${global.search.type}-details.html?id=${
+            result.id
+          }">
+            ${
+              result.poster_path
+                ? `<img src="https://image.tmdb.org/t/p/w500${
+                    result.poster_path
+                  }"
+              class="card-img-top"
+              alt="${
+                global.search.type === "movie" ? result.title : result.name
+              }" />`
+                : `<img src="images/no-image.jpg"
+              class="card-img-top"
+              alt="${
+                global.search.type === "movie" ? result.title : result.name
+              }" />`
+            }
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">${
+              global.search.type === "movie" ? result.title : result.name
+            }</h5>
+            <p class="card-text">
+              <small class="text-muted">Release:
+              ${
+                global.search.type === "movie"
+                  ? result.release_date
+                  : result.first_air_date
+              }</small>
+            </p>
+          </div>`;
+          document.getElementById("search-results").appendChild(div);
+        });
+      } else {
+        showAlert("Please enter a search term", "alert-error");
+      }
+    })
+    .catch((err) => console.error(err));
+}
+
+// Custom show alert
+function showAlert(message, className = "alert alert-error") {
+  alertEl = document.createElement("div");
+  alertEl.classList.add("alert", className);
+  alertEl.appendChild(document.createTextNode(message));
+  document.getElementById("alert").appendChild(alertEl);
+
+  setTimeout(() => {
+    // alertEl.style.display = "none";
+    // document.getElementById("alert").removeChild(alertEl);
+    alertEl.remove();
+  }, 3000);
 }
 
 function formatMoney(number) {
@@ -329,6 +525,7 @@ function init() {
     case "/index.html":
       console.log("home");
       displayPopularMovies();
+      displayNowplaying();
       break;
     case "/shows.html":
       console.log("shows");
@@ -342,6 +539,7 @@ function init() {
       displayTVDetails();
     case "/search.html":
       console.log("search");
+      search();
   }
   highlightActive();
 }
