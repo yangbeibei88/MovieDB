@@ -83,6 +83,8 @@ ul {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  width: 100%;
+  /* max-width: 100%; */
 }
 
 .main-header {
@@ -244,14 +246,24 @@ section h2 {
   justify-content: space-between;
   align-items: center;
   margin: 50px 0 30px;
+  width: 100%;
 }
 
+
 .details-top img {
-  width: 400px;
-  height: 100%;
-  margin-right: 60px;
-  object-fit: cover;
+  width: 300px;
+  height: auto;
+  /* margin-right: 60px; */
+  /* object-fit: cover; */
+  margin: 20px;
 }
+
+@media (max-width: 768px) {
+  .details-top {
+    flex-direction: column;
+  }
+}
+
 
 .details-top p {
   margin: 20px 0;
