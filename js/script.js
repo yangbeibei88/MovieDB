@@ -588,6 +588,7 @@ function init() {
       displayNowplaying();
       break;
     case "/shows.html":
+    case "/shows":
       console.log("shows");
       displayPopularTVShows();
       break;
