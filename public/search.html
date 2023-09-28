@@ -16,27 +16,30 @@
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet"
-    href="lib/fontawesome.css" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/spinner.css" />
-  <script src="js/script.js" defer></script>
+    href="/lib/fontawesome.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet"
+    href="/css/spinner.css" />
+  <script src="/js/script.js" defer></script>
   <title>MovieDB | Search Movies & Shows</title>
 </head>
 
 <body>
   <header class="main-header">
     <div class="container">
-      <div class="logo"><a href="/">MovieDB</a>
+      <div class="logo"><a
+          href="/index.html">MovieDB</a>
       </div>
       <nav>
         <ul>
           <li>
             <a class="nav-link"
-              href="/">Movies</a>
+              href="/index">Movies</a>
           </li>
           <li>
             <a class="nav-link"
-              href="/shows.html">TV Shows</a>
+              href="/public/shows.html">TV
+              Shows</a>
           </li>
         </ul>
       </nav>
@@ -47,7 +50,7 @@
   <section class="search">
     <div class="container">
       <div id="alert"></div>
-      <form action="/search.html"
+      <form action="/public/search.html"
         class="search-form">
         <div class="search-radio">
           <input type="radio" id="movie"

@@ -332,7 +332,7 @@ function displayNowplaying() {
         const div = document.createElement("div");
         div.className = "swiper-slide";
         div.innerHTML = `
-        <a href="movie-details.html?id=${movie.id}">
+        <a href="/public/movie-details.html?id=${movie.id}">
         ${
           movie.poster_path
             ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />`
@@ -587,18 +587,20 @@ function init() {
       displayPopularMovies();
       displayNowplaying();
       break;
-    case "/shows.html":
-    case "/shows":
+    // case "/shows.html":
+    // case "/shows":
+    case "/public/shows.html":
+    case "/public/shows":
       console.log("shows");
       displayPopularTVShows();
       break;
-    case "/movie-details.html":
+    case "/public/movie-details.html":
       console.log("movie details");
       displayMovieDetails();
-    case "/tv-details.html":
+    case "/public/tv-details.html":
       console.log("tv details");
       displayTVDetails();
-    case "/search.html":
+    case "/public/search.html":
       console.log("search");
       search();
   }
