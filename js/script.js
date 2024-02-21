@@ -63,7 +63,7 @@ function displayPopularMovies() {
         const popularMovies = document.getElementById("popular-movies");
         const div = document.createElement("div");
         div.className = "card";
-        div.innerHTML = `<a href="movie-details.html?id=${movie.id}">
+        div.innerHTML = `<a href="/public/movie-details.html?id=${movie.id}">
 
         ${
           movie.poster_path
@@ -583,6 +583,7 @@ function init() {
   switch (global.currentPage) {
     case "/":
     case "/index.html":
+    case "/MovieDB/":
       console.log("home");
       displayPopularMovies();
       displayNowplaying();
