@@ -6,16 +6,8 @@ const global = {
     page: 1,
     totalPages: 1,
     totalResults: 0,
-  },
-  apiURL: "https://api.themoviedb.org/3/",
-};
-
-const options = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization:
-      "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMWUyN2Y1MjQ2NWM4MWY1YjNlMWQ4OGM1NjE1MTUzMyIsInN1YiI6IjY0YmI1NDc0ZWI3OWMyMDBlMjhjYjYwYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.PiSeqGdciSnRUE7KdUT-kkcLVLYk2nBc_SZdbxP9TTo",
+    include_adult: false,
+    language: "en-US",
   },
 };
 
@@ -50,10 +42,7 @@ function highlightActive() {
 
 // display popular movies on home page
 function displayPopularMovies() {
-  fetch(
-    "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1",
-    options
-  )
+  fetch("/api/popular-movies")
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
@@ -63,7 +52,7 @@ function displayPopularMovies() {
         const popularMovies = document.getElementById("popular-movies");
         const div = document.createElement("div");
         div.className = "card";
-        div.innerHTML = `<a href="/public/movie-details.html?id=${movie.id}">
+        div.innerHTML = `<a href="movie-details.html?id=${movie.id}">
 
         ${
           movie.poster_path
@@ -87,10 +76,7 @@ function displayPopularMovies() {
 
 // display popular TV shows
 function displayPopularTVShows() {
-  fetch(
-    "https://api.themoviedb.org/3/tv/popular?language=en-US&page=1",
-    options
-  )
+  fetch("/api/popular-shows")
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
@@ -125,11 +111,14 @@ function displayPopularTVShows() {
 // display movie details
 function displayMovieDetails() {
   // const currentMovieID = location.search.slice(4);
-  const currentMovieID = location.search.split("=")[1];
-  fetch(
-    `https://api.themoviedb.org/3/movie/${currentMovieID}?language=en-US`,
-    options
-  )
+  // const currentMovieID = location.search.split("=")[1];
+  const currentMovieID = new URLSearchParams(window.location.search).get("id");
+
+  if (!currentMovieID) {
+    console.error("No movie id found in the url");
+    return;
+  }
+  fetch(`/api/movie-details/${currentMovieID}`)
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
@@ -214,11 +203,14 @@ function displayMovieDetails() {
 
 // display TV details
 function displayTVDetails() {
-  const currentTvID = location.search.split("=")[1];
-  fetch(
-    `https://api.themoviedb.org/3/tv/${currentTvID}?language=en-US`,
-    options
-  )
+  // const currentTvID = location.search.split("=")[1];
+  const currentTvID = new URLSearchParams(window.location.search).get("id");
+
+  if (!currentTvID) {
+    console.error("No series ID found in the URL.");
+    return;
+  }
+  fetch(`/api/tv-details/${currentTvID}`)
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
@@ -320,10 +312,7 @@ function displayBackdrop(backdropPath) {
 }
 
 function displayNowplaying() {
-  fetch(
-    "https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1",
-    options
-  )
+  fetch("api/nowplaying")
     .then((response) => response.json())
     .then((data) => {
       console.log(data.results);
@@ -332,7 +321,7 @@ function displayNowplaying() {
         const div = document.createElement("div");
         div.className = "swiper-slide";
         div.innerHTML = `
-        <a href="/public/movie-details.html?id=${movie.id}">
+        <a href="movie-details.html?id=${movie.id}">
         ${
           movie.poster_path
             ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />`
@@ -538,9 +527,11 @@ function displayPagination() {
 }
 
 async function searchAPIData() {
+  const type = new URLSearchParams(window.location.search).get("type");
+  const term = new URLSearchParams(window.location.search).get("search-term");
+  // const page = new URLSearchParams(window.location.search).get("page");
   const response = await fetch(
-    `https://api.themoviedb.org/3/search/${global.search.type}?query=${global.search.term}&language=en-US&page=${global.search.page}`,
-    options
+    `/api/search/${type}?query=${term}&page=${global.search.page}`
   );
 
   const data = await response.json();
@@ -583,25 +574,29 @@ function init() {
   switch (global.currentPage) {
     case "/":
     case "/index.html":
+    case "/public/index.html":
     case "/MovieDB/":
       console.log("home");
       displayPopularMovies();
       displayNowplaying();
       break;
-    // case "/shows.html":
-    // case "/shows":
     case "/public/shows.html":
     case "/public/shows":
+    case "/shows.html":
+    case "/shows":
       console.log("shows");
       displayPopularTVShows();
       break;
     case "/public/movie-details.html":
+    case "/movie-details.html":
       console.log("movie details");
       displayMovieDetails();
     case "/public/tv-details.html":
+    case "/tv-details.html":
       console.log("tv details");
       displayTVDetails();
     case "/public/search.html":
+    case "/search.html":
       console.log("search");
       search();
   }
