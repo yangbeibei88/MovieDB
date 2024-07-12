@@ -9,8 +9,8 @@
   },
   "keywords": [],
   "author": "Beibei Yang",
-  "license": "ISC",
-  "description": "",
+  "license": "MIT",
+  "description": "Javascript & NodeJS that displays movies and TV Series from TMDB API",
   "dependencies": {
     "apicache": "^1.6.3",
     "cors": "^2.8.5",
